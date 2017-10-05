@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             asyncASRInitializerTask.execute();
         } else {
             startButton.setEnabled(true);
-//            final Button stopButton = (Button) findViewById(R.id.stopListening);
-//            stopButton.setEnabled(true);
         }
 
         MainActivity.instance = this;
@@ -92,19 +90,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             }
         });
 
-//        ((Button) findViewById(R.id.stopListening)).setOnClickListener(new OnClickListener() {
-//            public void onClick(View view) {
-//                Log.i(TAG, "Stop listening...");
-////                KASRRecognizer.sharedInstance().stopListening();
-//                KASRResult r = KASRRecognizer.sharedInstance().stopListeningAndReturnFinalResult();
-//                if (levelUpdateTimer!=null)
-//                    levelUpdateTimer.cancel();
-//
-//                Log.i(TAG, "final result: " + r);
-//                final Button startButton = (Button)findViewById(R.id.startListening);
-//                startButton.setEnabled(true);
-//            }
-//        });
 
     }
 
@@ -130,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         if (levelUpdateTimer!=null)
             levelUpdateTimer.cancel();
 
-        //resultText.setText(text);
         boolean status = resultText.post(new Runnable() {
             @Override
             public void run() {
