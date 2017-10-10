@@ -115,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         if (levelUpdateTimer!=null)
             levelUpdateTimer.cancel();
 
+        Log.i(TAG, "audioFile is in " + recognizer.getLastRecordingFilename());
+
         boolean status = resultText.post(new Runnable() {
             @Override
             public void run() {
@@ -284,6 +286,8 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 10.0f);
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 3.0f);
+
+            recognizer.setCreateAudioRecordings(true);
 
             final Button startButton = (Button)findViewById(R.id.startListening);
             startButton.setEnabled(true);
