@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             assets.add("librispeech-nnet2-en-us/splice.conf");
             assets.add("librispeech-nnet2-en-us/splice_opts");
             assets.add("librispeech-nnet2-en-us/wordBoundaries.int");
+            assets.add("librispeech-nnet2-en-us/words.txt");
 
             assets.add("librispeech-nnet2-en-us/lang/lexicon.txt");
             assets.add("librispeech-nnet2-en-us/lang/phones.txt");
