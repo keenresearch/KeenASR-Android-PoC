@@ -117,6 +117,10 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
         Log.i(TAG, "audioFile is in " + recognizer.getLastRecordingFilename());
 
+        // we don't really need to do this after every result, only if it's likely user will exit
+        // the app (e.g. view will disappear, etc.)
+        recognizer.saveSpeakerAdaptation();
+
         boolean status = resultText.post(new Runnable() {
             @Override
             public void run() {
@@ -289,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 3.0f);
 
             recognizer.setCreateAudioRecordings(true);
+            recognizer.adaptToSpeakerWithName("john");
 
             final Button startButton = (Button)findViewById(R.id.startListening);
             startButton.setEnabled(true);
