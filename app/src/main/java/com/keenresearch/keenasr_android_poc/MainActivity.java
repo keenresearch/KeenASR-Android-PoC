@@ -225,28 +225,27 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
-            assets.add("librispeech-nnet2-en-us/decode.conf");
-            assets.add("librispeech-nnet2-en-us/final.dubm");
-            assets.add("librispeech-nnet2-en-us/final.ie");
-            assets.add("librispeech-nnet2-en-us/final.mat");
-            assets.add("librispeech-nnet2-en-us/final.mdl");
-            assets.add("librispeech-nnet2-en-us/global_cmvn.stats");
-            assets.add("librispeech-nnet2-en-us/ivector_extractor.conf");
-            assets.add("librispeech-nnet2-en-us/mfcc.conf");
-            assets.add("librispeech-nnet2-en-us/online_cmvn.conf");
-            assets.add("librispeech-nnet2-en-us/splice.conf");
-            assets.add("librispeech-nnet2-en-us/splice_opts");
-            assets.add("librispeech-nnet2-en-us/wordBoundaries.int");
-            assets.add("librispeech-nnet2-en-us/words.txt");
+            assets.add("librispeechQT-nnet2-en-us/decode.conf");
+            assets.add("librispeechQT-nnet2-en-us/final.dubm");
+            assets.add("librispeechQT-nnet2-en-us/final.ie");
+            assets.add("librispeechQT-nnet2-en-us/final.mat");
+            assets.add("librispeechQT-nnet2-en-us/final.mdl");
+            assets.add("librispeechQT-nnet2-en-us/global_cmvn.stats");
+            assets.add("librispeechQT-nnet2-en-us/ivector_extractor.conf");
+            assets.add("librispeechQT-nnet2-en-us/mfcc.conf");
+            assets.add("librispeechQT-nnet2-en-us/online_cmvn.conf");
+            assets.add("librispeechQT-nnet2-en-us/splice.conf");
+            assets.add("librispeechQT-nnet2-en-us/splice_opts");
+            assets.add("librispeechQT-nnet2-en-us/wordBoundaries.int");
+            assets.add("librispeechQT-nnet2-en-us/words.txt");
 
-            assets.add("librispeech-nnet2-en-us/lang/lexicon.txt");
-            assets.add("librispeech-nnet2-en-us/lang/phones.txt");
-            assets.add("librispeech-nnet2-en-us/lang/tree");
+            assets.add("librispeechQT-nnet2-en-us/lang/lexicon.txt");
+            assets.add("librispeechQT-nnet2-en-us/lang/phones.txt");
+            assets.add("librispeechQT-nnet2-en-us/lang/tree");
 
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
-            String asrBundlePath = new String(asrBundleRootPath + "/librispeech-nnet2-en-us");
-//            String asrBundlePath = new String(asrBundleRootPath + "/aspire-nnet3chain-en-us");
+            String asrBundlePath = new String(asrBundleRootPath + "/librispeechQT-nnet2-en-us");
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
             } catch (IOException e) {
