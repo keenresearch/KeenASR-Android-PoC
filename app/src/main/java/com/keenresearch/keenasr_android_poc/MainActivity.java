@@ -238,14 +238,13 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             assets.add("librispeechQT-nnet2-en-us/splice_opts");
             assets.add("librispeechQT-nnet2-en-us/wordBoundaries.int");
             assets.add("librispeechQT-nnet2-en-us/words.txt");
-
             assets.add("librispeechQT-nnet2-en-us/lang/lexicon.txt");
             assets.add("librispeechQT-nnet2-en-us/lang/phones.txt");
             assets.add("librispeechQT-nnet2-en-us/lang/tree");
 
-
             String asrBundleRootPath = getApplicationInfo().dataDir;
             String asrBundlePath = new String(asrBundleRootPath + "/librispeechQT-nnet2-en-us");
+
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
             } catch (IOException e) {
@@ -265,9 +264,18 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
             KASRRecognizer recognizer = KASRRecognizer.sharedInstance();
             if (recognizer != null) {
-               String dgName = "words";
+                String dgName = "words";
+                // we don't have to recreate the decoding graph every time, but during the development
+                // this could be a problem if the list of sentences/phrases is changed, so we opt to
+                // create it every time
+//                if (KASRDecodingGraph.decodingGraphWithNameExists(dgName, recognizer)) {
+//                    Log.i(TAG, "Decoding graph " + dgName + " alread exists. IT WON'T BE RECREATED");
+//                } else {
+//                    KASRDecodingGraph.createDecodingGraphFromSentences(sentences, recognizer, dgName); // TODO check return code
+//                }
                 KASRDecodingGraph.createDecodingGraphFromSentences(sentences, recognizer, dgName); // TODO check return code
                 recognizer.prepareForListeningWithCustomDecodingGraphWithName("words");
+
             } else {
                 Log.e(TAG, "Unable to retrieve recognizer");
             }
@@ -288,8 +296,8 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             recognizer.addListener(MainActivity.instance);
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1.0f);
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 10.0f);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 3.0f);
+            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
+            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
             recognizer.setCreateAudioRecordings(true);
             recognizer.adaptToSpeakerWithName("john");
