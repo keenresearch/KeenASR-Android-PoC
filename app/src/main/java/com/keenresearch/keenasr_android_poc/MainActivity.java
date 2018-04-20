@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.graphics.Color;
 import android.widget.Toast;
 
-
 import com.keenresearch.keenasr.KASRDecodingGraph;
 import com.keenresearch.keenasr.KASRRecognizer;
 import com.keenresearch.keenasr.KASRResult;
@@ -109,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
     public void onFinalResult(KASRRecognizer recognizer, final KASRResult result) {
         Log.i(TAG, "Final result: " + result);
+        Log.i(TAG, "Final result JSON: " + result.toJSON());
+
         final TextView resultText = (TextView)findViewById(R.id.resultText);
         final Button startButton = (Button)findViewById(R.id.startListening);
         Log.i(TAG, "resultText: " + resultText);
@@ -242,8 +243,26 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             assets.add("librispeechQT-nnet2-en-us/lang/phones.txt");
             assets.add("librispeechQT-nnet2-en-us/lang/tree");
 
+//            assets.add("keenB1-nnet3chain-en-us/decode.conf");
+//            assets.add("keenB1-nnet3chain-en-us/final.dubm");
+//            assets.add("keenB1-nnet3chain-en-us/final.ie");
+//            assets.add("keenB1-nnet3chain-en-us/final.mat");
+//            assets.add("keenB1-nnet3chain-en-us/final.mdl");
+//            assets.add("keenB1-nnet3chain-en-us/global_cmvn.stats");
+//            assets.add("keenB1-nnet3chain-en-us/ivector_extractor.conf");
+//            assets.add("keenB1-nnet3chain-en-us/mfcc.conf");
+//            assets.add("keenB1-nnet3chain-en-us/online_cmvn.conf");
+//            assets.add("keenB1-nnet3chain-en-us/splice.conf");
+//            assets.add("keenB1-nnet3chain-en-us/splice_opts");
+//            assets.add("keenB1-nnet3chain-en-us/wordBoundaries.int");
+//            assets.add("keenB1-nnet3chain-en-us/words.txt");
+//            assets.add("keenB1-nnet3chain-en-us/lang/lexicon.txt");
+//            assets.add("keenB1-nnet3chain-en-us/lang/phones.txt");
+//            assets.add("keenB1-nnet3chain-en-us/lang/tree");
+
             String asrBundleRootPath = getApplicationInfo().dataDir;
             String asrBundlePath = new String(asrBundleRootPath + "/librispeechQT-nnet2-en-us");
+//            String asrBundlePath = new String(asrBundleRootPath + "/keenB1-nnet3chain-en-us");
 
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
@@ -299,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
             recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
-            recognizer.setCreateAudioRecordings(true);
+            //recognizer.setCreateAudioRecordings(true);
             recognizer.adaptToSpeakerWithName("john");
 
             final Button startButton = (Button)findViewById(R.id.startListening);
@@ -318,6 +337,14 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
     private static String[] getSentences() {
         String[] sentences = {
+                "I don't know",
+                "yes",
+                "no",
+                "I love you",
+                "how are you",
+                "I am good",
+                "I feel good",
+                "I don't feel good",
                 "zero",
                 "one",
                 "two",
