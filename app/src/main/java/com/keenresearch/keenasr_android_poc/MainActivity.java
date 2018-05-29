@@ -1,9 +1,8 @@
 package com.keenresearch.keenasr_android_poc;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +26,7 @@ import com.keenresearch.keenasr.KASRResult;
 import com.keenresearch.keenasr.KASRRecognizerListener;
 import com.keenresearch.keenasr.KASRBundle;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -49,11 +49,11 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // disable start button until initialization is completed
         final Button startButton = (Button)findViewById(R.id.startListening);
         startButton.setEnabled(false);
-
         // we need to make sure audio permission is granted before initializing KeenASR SDK
         requestAudioPermissions();
 
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
     }
 
     public void onPartialResult(KASRRecognizer recognizer, final KASRResult result) {
-        Log.i(TAG, "   Partial result: " + result);
+        Log.i(TAG, "   Partial result: " + result.getCleanText());
 
         final TextView resultText = (TextView)findViewById(R.id.resultText);
         //resultText.setText(text);
@@ -117,10 +117,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             levelUpdateTimer.cancel();
 
         Log.i(TAG, "audioFile is in " + recognizer.getLastRecordingFilename());
-
-        // we don't really need to do this after every result, only if it's likely user will exit
-        // the app (e.g. view will disappear, etc.)
-        recognizer.saveSpeakerAdaptation();
 
         boolean status = resultText.post(new Runnable() {
             @Override
@@ -226,43 +222,27 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
-            assets.add("librispeechQT-nnet2-en-us/decode.conf");
-            assets.add("librispeechQT-nnet2-en-us/final.dubm");
-            assets.add("librispeechQT-nnet2-en-us/final.ie");
-            assets.add("librispeechQT-nnet2-en-us/final.mat");
-            assets.add("librispeechQT-nnet2-en-us/final.mdl");
-            assets.add("librispeechQT-nnet2-en-us/global_cmvn.stats");
-            assets.add("librispeechQT-nnet2-en-us/ivector_extractor.conf");
-            assets.add("librispeechQT-nnet2-en-us/mfcc.conf");
-            assets.add("librispeechQT-nnet2-en-us/online_cmvn.conf");
-            assets.add("librispeechQT-nnet2-en-us/splice.conf");
-            assets.add("librispeechQT-nnet2-en-us/splice_opts");
-            assets.add("librispeechQT-nnet2-en-us/wordBoundaries.int");
-            assets.add("librispeechQT-nnet2-en-us/words.txt");
-            assets.add("librispeechQT-nnet2-en-us/lang/lexicon.txt");
-            assets.add("librispeechQT-nnet2-en-us/lang/phones.txt");
-            assets.add("librispeechQT-nnet2-en-us/lang/tree");
 
-//            assets.add("keenB1-nnet3chain-en-us/decode.conf");
-//            assets.add("keenB1-nnet3chain-en-us/final.dubm");
-//            assets.add("keenB1-nnet3chain-en-us/final.ie");
-//            assets.add("keenB1-nnet3chain-en-us/final.mat");
-//            assets.add("keenB1-nnet3chain-en-us/final.mdl");
-//            assets.add("keenB1-nnet3chain-en-us/global_cmvn.stats");
-//            assets.add("keenB1-nnet3chain-en-us/ivector_extractor.conf");
-//            assets.add("keenB1-nnet3chain-en-us/mfcc.conf");
-//            assets.add("keenB1-nnet3chain-en-us/online_cmvn.conf");
-//            assets.add("keenB1-nnet3chain-en-us/splice.conf");
-//            assets.add("keenB1-nnet3chain-en-us/splice_opts");
-//            assets.add("keenB1-nnet3chain-en-us/wordBoundaries.int");
-//            assets.add("keenB1-nnet3chain-en-us/words.txt");
-//            assets.add("keenB1-nnet3chain-en-us/lang/lexicon.txt");
-//            assets.add("keenB1-nnet3chain-en-us/lang/phones.txt");
-//            assets.add("keenB1-nnet3chain-en-us/lang/tree");
+            assets.add("keenB1-nnet3chain-en-us/decode.conf");
+            assets.add("keenB1-nnet3chain-en-us/final.dubm");
+            assets.add("keenB1-nnet3chain-en-us/final.ie");
+            assets.add("keenB1-nnet3chain-en-us/final.mat");
+            assets.add("keenB1-nnet3chain-en-us/final.mdl");
+            assets.add("keenB1-nnet3chain-en-us/global_cmvn.stats");
+            assets.add("keenB1-nnet3chain-en-us/ivector_extractor.conf");
+            assets.add("keenB1-nnet3chain-en-us/mfcc.conf");
+            assets.add("keenB1-nnet3chain-en-us/online_cmvn.conf");
+            assets.add("keenB1-nnet3chain-en-us/splice.conf");
+            assets.add("keenB1-nnet3chain-en-us/splice_opts");
+            assets.add("keenB1-nnet3chain-en-us/wordBoundaries.int");
+            assets.add("keenB1-nnet3chain-en-us/words.txt");
+            assets.add("keenB1-nnet3chain-en-us/lang/lexicon.txt");
+            assets.add("keenB1-nnet3chain-en-us/lang/phones.txt");
+            assets.add("keenB1-nnet3chain-en-us/lang/tree");
+
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
-            String asrBundlePath = new String(asrBundleRootPath + "/librispeechQT-nnet2-en-us");
-//            String asrBundlePath = new String(asrBundleRootPath + "/keenB1-nnet3chain-en-us");
+            String asrBundlePath = new String(asrBundleRootPath + "/keenB1-nnet3chain-en-us");
 
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
@@ -279,21 +259,23 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Microphone permission is granted");
             Log.i(TAG, "Initializing with bundle at path: " + asrBundlePath);
             KASRRecognizer.initWithASRBundleAtPath(asrBundlePath, getApplicationContext());
-            String[] sentences = MainActivity.getSentences();
+            String[] phrases = MainActivity.getPhrases();
 
             KASRRecognizer recognizer = KASRRecognizer.sharedInstance();
             if (recognizer != null) {
                 String dgName = "words";
                 // we don't have to recreate the decoding graph every time, but during the development
-                // this could be a problem if the list of sentences/phrases is changed, so we opt to
-                // create it every time
+                // this could be a problem if the list of sentences/phrases is changed (decoding graph
+                // would not be re-created), so we opt to create it every time
 //                if (KASRDecodingGraph.decodingGraphWithNameExists(dgName, recognizer)) {
 //                    Log.i(TAG, "Decoding graph " + dgName + " alread exists. IT WON'T BE RECREATED");
+                    Log.i(TAG, "Created on " + KASRDecodingGraph.getDecodingGraphCreationDate(dgName, recognizer));
 //                } else {
-//                    KASRDecodingGraph.createDecodingGraphFromSentences(sentences, recognizer, dgName); // TODO check return code
+//                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); // TODO check return code
 //                }
-                KASRDecodingGraph.createDecodingGraphFromSentences(sentences, recognizer, dgName); // TODO check return code
-                recognizer.prepareForListeningWithCustomDecodingGraphWithName("words");
+                       KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); // TODO check return code
+
+                recognizer.prepareForListeningWithCustomDecodingGraphWithName(dgName);
 
             } else {
                 Log.e(TAG, "Unable to retrieve recognizer");
@@ -310,41 +292,45 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         protected void onPostExecute(Long result) {
             super.onPostExecute(result);
             Log.i(TAG, "Initialized KeenASR in the background");
-            Log.i(TAG, "Adding listener");
             KASRRecognizer recognizer = KASRRecognizer.sharedInstance();
-            recognizer.addListener(MainActivity.instance);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1.0f);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
-            recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
+            if (recognizer!=null) {
+                Log.i(TAG, "Adding listener");
+                recognizer.addListener(MainActivity.instance);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1.0f);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
-            //recognizer.setCreateAudioRecordings(true);
-            recognizer.adaptToSpeakerWithName("john");
+                //recognizer.setCreateAudioRecordings(true);
 
-            final Button startButton = (Button)findViewById(R.id.startListening);
-            startButton.setEnabled(true);
+                final Button startButton = (Button) findViewById(R.id.startListening);
+                startButton.setEnabled(true);
+            } else {
+                Log.e(TAG, "Recognizer wasn't initialized properly");
+            }
         }
     }
 
-    static {
-        Log.i(TAG, "Loading shared libraries");
-        System.loadLibrary("c++_shared");
-        System.loadLibrary("keenasr-jni");
-        Log.i(TAG, "Loaded shared libraries");
-    }
-
-
-
-    private static String[] getSentences() {
+    private static String[] getPhrases() {
         String[] sentences = {
                 "I don't know",
                 "yes",
                 "no",
                 "I love you",
+                "I hate you",
                 "how are you",
                 "I am good",
+                "I'm good",
                 "I feel good",
                 "I don't feel good",
+                "I'm sick",
+                "I am sick",
+                "What's up",
+                "How are things",
+                "How is life",
+                "How's life",
+                "Let's go",
+                "Let's dance",
                 "zero",
                 "one",
                 "two",
@@ -360,3 +346,5 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         return sentences;
     }
 }
+
+
