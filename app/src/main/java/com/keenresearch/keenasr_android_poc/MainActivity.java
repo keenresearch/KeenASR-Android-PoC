@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
         if (KASRRecognizer.sharedInstance() == null) {
             Log.i(TAG, "Initializing KeenASR recognizer");
-            KASRRecognizer.setLogLevel(KASRRecognizer.KASRRecognizerLogLevel.KASRRecognizerLogLevelInfo);
+            KASRRecognizer.setLogLevel(KASRRecognizer.KASRRecognizerLogLevel.KASRRecognizerLogLevelDebug);
             Context context = this.getApplication().getApplicationContext();
             asyncASRInitializerTask = new ASyncASRInitializerTask(context);
             asyncASRInitializerTask.execute();
@@ -223,26 +223,26 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
 
-            assets.add("keenB1-nnet3chain-en-us/decode.conf");
-            assets.add("keenB1-nnet3chain-en-us/final.dubm");
-            assets.add("keenB1-nnet3chain-en-us/final.ie");
-            assets.add("keenB1-nnet3chain-en-us/final.mat");
-            assets.add("keenB1-nnet3chain-en-us/final.mdl");
-            assets.add("keenB1-nnet3chain-en-us/global_cmvn.stats");
-            assets.add("keenB1-nnet3chain-en-us/ivector_extractor.conf");
-            assets.add("keenB1-nnet3chain-en-us/mfcc.conf");
-            assets.add("keenB1-nnet3chain-en-us/online_cmvn.conf");
-            assets.add("keenB1-nnet3chain-en-us/splice.conf");
-            assets.add("keenB1-nnet3chain-en-us/splice_opts");
-            assets.add("keenB1-nnet3chain-en-us/wordBoundaries.int");
-            assets.add("keenB1-nnet3chain-en-us/words.txt");
-            assets.add("keenB1-nnet3chain-en-us/lang/lexicon.txt");
-            assets.add("keenB1-nnet3chain-en-us/lang/phones.txt");
-            assets.add("keenB1-nnet3chain-en-us/lang/tree");
+            assets.add("keenB2mQT-nnet3chain-en-us/decode.conf");
+            assets.add("keenB2mQT-nnet3chain-en-us/final.dubm");
+            assets.add("keenB2mQT-nnet3chain-en-us/final.ie");
+            assets.add("keenB2mQT-nnet3chain-en-us/final.mat");
+            assets.add("keenB2mQT-nnet3chain-en-us/final.mdl");
+            assets.add("keenB2mQT-nnet3chain-en-us/global_cmvn.stats");
+            assets.add("keenB2mQT-nnet3chain-en-us/ivector_extractor.conf");
+            assets.add("keenB2mQT-nnet3chain-en-us/mfcc.conf");
+            assets.add("keenB2mQT-nnet3chain-en-us/online_cmvn.conf");
+            assets.add("keenB2mQT-nnet3chain-en-us/splice.conf");
+            assets.add("keenB2mQT-nnet3chain-en-us/splice_opts");
+            assets.add("keenB2mQT-nnet3chain-en-us/wordBoundaries.int");
+            assets.add("keenB2mQT-nnet3chain-en-us/words.txt");
+            assets.add("keenB2mQT-nnet3chain-en-us/lang/lexicon.txt");
+            assets.add("keenB2mQT-nnet3chain-en-us/lang/phones.txt");
+            assets.add("keenB2mQT-nnet3chain-en-us/lang/tree");
 
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
-            String asrBundlePath = new String(asrBundleRootPath + "/keenB1-nnet3chain-en-us");
+            String asrBundlePath = new String(asrBundleRootPath + "/keenB2m QT-nnet3chain-en-us");
 
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
