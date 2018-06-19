@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
-            String asrBundlePath = new String(asrBundleRootPath + "/keenB2m QT-nnet3chain-en-us");
+            String asrBundlePath = new String(asrBundleRootPath + "/keenB2mQT-nnet3chain-en-us");
 
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
