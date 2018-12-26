@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 //                    Log.i(TAG, "Decoding graph " + dgName + " alread exists. IT WON'T BE RECREATED");
 //                    Log.i(TAG, "Created on " + KASRDecodingGraph.getDecodingGraphCreationDate(dgName, recognizer));
 //                } else {
-//                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); // 
+//                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); //
 //                }
                        KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); // TODO check return code
 
