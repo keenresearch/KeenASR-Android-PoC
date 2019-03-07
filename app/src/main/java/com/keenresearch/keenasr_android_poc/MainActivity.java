@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,7 @@ import com.keenresearch.keenasr.KASRDecodingGraph;
 import com.keenresearch.keenasr.KASRRecognizer;
 import com.keenresearch.keenasr.KASRResult;
 import com.keenresearch.keenasr.KASRRecognizerListener;
+import com.keenresearch.keenasr.KASRRecognizerTriggerPhraseListener;
 import com.keenresearch.keenasr.KASRBundle;
 
 
@@ -32,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements KASRRecognizerListener {
+public class MainActivity extends AppCompatActivity implements KASRRecognizerListener , KASRRecognizerTriggerPhraseListener{
     protected static final String TAG =MainActivity.class.getSimpleName();
     private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
     private TimerTask levelUpdateTask;
@@ -106,6 +109,11 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         });
     }
 
+    public void onTriggerPhrase(KASRRecognizer recognizer) {
+        Log.i(TAG, "Trigger phrase occurred!");
+    }
+
+
     public void onFinalResult(KASRRecognizer recognizer, final KASRResult result) {
         Log.i(TAG, "Final result: " + result);
         Log.i(TAG, "Final result JSON: " + result.toJSON());
@@ -160,6 +168,9 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
 
     private void requestAudioPermissions() {
         if (ContextCompat.checkSelfPermission(this,
@@ -271,12 +282,11 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 //                    Log.i(TAG, "Decoding graph " + dgName + " alread exists. IT WON'T BE RECREATED");
 //                    Log.i(TAG, "Created on " + KASRDecodingGraph.getDecodingGraphCreationDate(dgName, recognizer));
 //                } else {
-//                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); //
+                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); //
 //                }
-                       KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); // TODO check return code
 
+//                KASRDecodingGraph.createDecodingGraphFromSentencesWithTriggerPhrase(phrases, "Hey computer", recognizer, dgName); // TODO check return code
                 recognizer.prepareForListeningWithCustomDecodingGraphWithName(dgName);
-
             } else {
                 Log.e(TAG, "Unable to retrieve recognizer");
             }
@@ -296,12 +306,13 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             if (recognizer!=null) {
                 Log.i(TAG, "Adding listener");
                 recognizer.addListener(MainActivity.instance);
+                recognizer.addTriggerPhraseListener(MainActivity.instance);
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1.0f);
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
-                //recognizer.setCreateAudioRecordings(true);
+                recognizer.setCreateAudioRecordings(true);
 
                 final Button startButton = (Button) findViewById(R.id.startListening);
                 startButton.setEnabled(true);
