@@ -30,6 +30,7 @@ import com.keenresearch.keenasr.KASRRecognizerTriggerPhraseListener;
 import com.keenresearch.keenasr.KASRBundle;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -233,27 +234,28 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
+            String asrBundleName = "keenB2mQT-nnet3chain-en-us";
 
-            assets.add("keenB2mQT-nnet3chain-en-us/decode.conf");
-            assets.add("keenB2mQT-nnet3chain-en-us/final.dubm");
-            assets.add("keenB2mQT-nnet3chain-en-us/final.ie");
-            assets.add("keenB2mQT-nnet3chain-en-us/final.mat");
-            assets.add("keenB2mQT-nnet3chain-en-us/final.mdl");
-            assets.add("keenB2mQT-nnet3chain-en-us/global_cmvn.stats");
-            assets.add("keenB2mQT-nnet3chain-en-us/ivector_extractor.conf");
-            assets.add("keenB2mQT-nnet3chain-en-us/mfcc.conf");
-            assets.add("keenB2mQT-nnet3chain-en-us/online_cmvn.conf");
-            assets.add("keenB2mQT-nnet3chain-en-us/splice.conf");
-            assets.add("keenB2mQT-nnet3chain-en-us/splice_opts");
-            assets.add("keenB2mQT-nnet3chain-en-us/wordBoundaries.int");
-            assets.add("keenB2mQT-nnet3chain-en-us/words.txt");
-            assets.add("keenB2mQT-nnet3chain-en-us/lang/lexicon.txt");
-            assets.add("keenB2mQT-nnet3chain-en-us/lang/phones.txt");
-            assets.add("keenB2mQT-nnet3chain-en-us/lang/tree");
+            assets.add(asrBundleName + "/decode.conf");
+            assets.add(asrBundleName + "/final.dubm");
+            assets.add(asrBundleName + "/final.ie");
+            assets.add(asrBundleName + "/final.mat");
+            assets.add(asrBundleName + "/final.mdl");
+            assets.add(asrBundleName + "/global_cmvn.stats");
+            assets.add(asrBundleName + "/ivector_extractor.conf");
+            assets.add(asrBundleName + "/mfcc.conf");
+            assets.add(asrBundleName + "/online_cmvn.conf");
+            assets.add(asrBundleName + "/splice.conf");
+            assets.add(asrBundleName + "/splice_opts");
+            assets.add(asrBundleName + "/wordBoundaries.int");
+            assets.add(asrBundleName + "/words.txt");
+            assets.add(asrBundleName + "/lang/lexicon.txt");
+            assets.add(asrBundleName + "/lang/phones.txt");
+            assets.add(asrBundleName + "/lang/tree");
 
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
-            String asrBundlePath = new String(asrBundleRootPath + "/keenB2mQT-nnet3chain-en-us");
+            String asrBundlePath = new String(asrBundleRootPath + "/" + asrBundleName);
 
             try {
                 asrBundle.installASRBundle(assets, asrBundleRootPath);
@@ -313,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
                 recognizer.setCreateAudioRecordings(true);
-
+                recognizer.adaptToSpeakerWithName("test");
                 final Button startButton = (Button) findViewById(R.id.startListening);
                 startButton.setEnabled(true);
             } else {
@@ -323,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
     }
 
     private static String[] getPhrases() {
-        String[] sentences = {
+        String[] phrases = {
                 "I don't know",
                 "yes",
                 "no",
@@ -354,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
                 "nine",
                 "ten"
         };
-        return sentences;
+        return phrases;
     }
 }
 
