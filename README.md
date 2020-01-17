@@ -1,3 +1,5 @@
+**WE ARE HIRING:** https://keenresearch.com/careers.html
+
 # KeenASR Android Proof of Concept App
 This proof-of-concept app ships with a trial version of KeenASR SDK, which will exit (crash) the app 15min after the app starts. If you would like to obtain a version of the framework without this limitation, contact us at info@keenresearch.com.
 
