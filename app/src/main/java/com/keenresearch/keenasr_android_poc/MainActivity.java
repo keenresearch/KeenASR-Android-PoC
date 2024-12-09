@@ -4,13 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,19 +23,22 @@ import android.widget.Toast;
 
 import com.keenresearch.keenasr.KASRDecodingGraph;
 import com.keenresearch.keenasr.KASRRecognizer;
+import com.keenresearch.keenasr.KASRResponse;
 import com.keenresearch.keenasr.KASRResult;
+import com.keenresearch.keenasr.KASRWord;
+import com.keenresearch.keenasr.KASRPhone;
 import com.keenresearch.keenasr.KASRRecognizerListener;
-import com.keenresearch.keenasr.KASRRecognizerTriggerPhraseListener;
 import com.keenresearch.keenasr.KASRBundle;
-
+import com.keenresearch.keenasr.KASRAlternativePronunciation;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements KASRRecognizerListener , KASRRecognizerTriggerPhraseListener{
+public class MainActivity extends AppCompatActivity implements KASRRecognizerListener {
     protected static final String TAG =MainActivity.class.getSimpleName();
     private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
     private TimerTask levelUpdateTask;
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
     private ASyncASRInitializerTask asyncASRInitializerTask;
     public static MainActivity instance;
     private Boolean micPermissionGranted = false;
-
+    private BluetoothManager btManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +63,14 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         // we need to make sure audio permission is granted before initializing KeenASR SDK
         requestAudioPermissions();
 
+        Context context = this.getApplication().getApplicationContext();
+
+        btManager = BluetoothManager.getInstance(context);
+        btManager.initBluetooth();
+
         if (KASRRecognizer.sharedInstance() == null) {
             Log.i(TAG, "Initializing KeenASR recognizer");
             KASRRecognizer.setLogLevel(KASRRecognizer.KASRRecognizerLogLevel.KASRRecognizerLogLevelDebug);
-            Context context = this.getApplication().getApplicationContext();
             asyncASRInitializerTask = new ASyncASRInitializerTask(context);
             asyncASRInitializerTask.execute();
         } else {
@@ -73,34 +79,27 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
         MainActivity.instance = this;
 
+
         ((Button) findViewById(R.id.startListening)).setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
                 Log.i(TAG, "Starting to listen...");
+                System.gc();
                 final KASRRecognizer recognizer = KASRRecognizer.sharedInstance();
 
-                levelUpdateTimer = new Timer();
-                levelUpdateTask = new TimerTask() {
-                    public void run() {
-//                        Log.i(TAG, "     " + recognizer.getInputLevel());
-                    }
-                };
-                levelUpdateTimer.schedule(levelUpdateTask, 0, 80); // ~12 updates/sec
-
-                view.setEnabled(false);
+//                view.setEnabled(false);
                 TextView resultText = (TextView)findViewById(R.id.resultText);
                 resultText.setText("");
                 recognizer.startListening();
             }
         });
-
-
     }
 
+    // Partial result callback is called every ~180ms. Here, we just log the result and update the
+    // text field, so the user is aware something is happenning
     public void onPartialResult(KASRRecognizer recognizer, final KASRResult result) {
         Log.i(TAG, "   Partial result: " + result.getCleanText());
 
         final TextView resultText = (TextView)findViewById(R.id.resultText);
-        //resultText.setText(text);
         resultText.post(new Runnable() {
             @Override
             public void run() {
@@ -114,28 +113,47 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         Log.i(TAG, "Trigger phrase occurred!");
     }
 
-
-    public void onFinalResult(KASRRecognizer recognizer, final KASRResult result) {
+    // onFinalResponse callback is called when the recognizer stops listening. It provides the
+    // final recognition result, which contains a lot more detail than the partial result, as well
+    // as some additional information about the "response" (the most recent interaction), including
+    // access to audio recording and json metadata for the response.
+    public void onFinalResponse(final KASRRecognizer recognizer, final KASRResponse response) {
+//    public void onFinalResult(final KASRRecognizer recognizer, final KASRResult result) {
+        KASRResult result = response.getAsrResult();
         Log.i(TAG, "Final result: " + result);
-        Log.i(TAG, "Final result JSON: " + result.toJSON());
+        // we log word/phone info (in a real app you would do something else with this information)
+        for (KASRWord w : result.getWords()) {
+            Log.i(TAG, "  " + w.getText());
+            for (KASRPhone p : w.getPhones()) {
+              Log.i(TAG, "    " + p.getText() + "(" + p.getPronunciationScore() + ")");
+            }
+        }
+        // we can (optionally save audio and json into the filesystem if they are needed for further
+        // use in the app, or if you would like to push them to the back end
+        File dir = this.getApplication().getApplicationContext().getCacheDir();
+        response.saveAudio(dir);
+        response.saveJson(dir);
+
+        // some additional metadata in the response
+        Log.i(TAG, "audioFilepath:" + response.getAudioFilename());
+        Log.i(TAG, "jsonFilepath:" + response.getJsonFilename());
+        Log.i(TAG, "decoding graph: "  + response.getDecodingGraphName());
+        Log.i(TAG, "asr bundle: "  + response.getAsrBundleName());
+        Log.i(TAG, "version: "  + response.getSdkVersion());
+        Log.i(TAG, "start time: "  + response.getStartTime());
+//        Log.i(TAG, "Final result JSON: " + result.toJSON());
 
         final TextView resultText = (TextView)findViewById(R.id.resultText);
         final Button startButton = (Button)findViewById(R.id.startListening);
-        Log.i(TAG, "resultText: " + resultText);
+
         if (levelUpdateTimer!=null)
             levelUpdateTimer.cancel();
-
-        Log.i(TAG, "audioFile is in " + recognizer.getLastRecordingFilename());
 
         boolean status = resultText.post(new Runnable() {
             @Override
             public void run() {
                 Log.i(TAG, "Updating UI after receiving final result");
-                if (result.getConfidence() > 0.8)
-                    resultText.setTextColor(Color.GRAY);
-                else
-                    resultText.setTextColor(Color.argb(90, 200, 0, 0));
-
+                resultText.setTextColor(Color.GRAY);
                 resultText.setText(result.getCleanText());
                 startButton.setEnabled(true);
             }
@@ -143,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         if (!status) {
             Log.w(TAG, "Unable to post runnable to the UI queue");
         }
-
-
     }
 
 
@@ -234,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
-            String asrBundleName = "keenB2mQT-nnet3chain-en-us";
+            String asrBundleName = "keenAK3m-nnet3chain-en-us";
 
             assets.add(asrBundleName + "/decode.conf");
             assets.add(asrBundleName + "/final.dubm");
@@ -252,7 +268,12 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             assets.add(asrBundleName + "/lang/lexicon.txt");
             assets.add(asrBundleName + "/lang/phones.txt");
             assets.add(asrBundleName + "/lang/tree");
-
+            assets.add(asrBundleName + "/lang/unk_inv.fst");
+            assets.add(asrBundleName + "/gop_assets/HCLG.fst");
+            assets.add(asrBundleName + "/gop_assets/decode.conf");
+            assets.add(asrBundleName + "/gop_assets/phone-to-pure-phone.int");
+            assets.add(asrBundleName + "/gop_assets/phones-pure.txt");
+            assets.add(asrBundleName + "/gop_assets/pronunciation_model_batch.ort");
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
             String asrBundlePath = new String(asrBundleRootPath + "/" + asrBundleName);
@@ -267,35 +288,84 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             while (!micPermissionGranted) {
                 ;
                 // TODO should handle the situation where user denied to grant access
-                // so we can return without initailizing the SDK
+                // so we can return without initializing the SDK
             }
             Log.i(TAG, "Microphone permission is granted");
             Log.i(TAG, "Initializing with bundle at path: " + asrBundlePath);
             KASRRecognizer.initWithASRBundleAtPath(asrBundlePath, getApplicationContext());
-            String[] phrases = MainActivity.getPhrases();
+
+            Log.i(TAG, "Version: " + KASRRecognizer.version());
 
             KASRRecognizer recognizer = KASRRecognizer.sharedInstance();
-            if (recognizer != null) {
-                String dgName = "words";
-                // we don't have to recreate the decoding graph every time, but during the development
-                // this could be a problem if the list of sentences/phrases is changed (decoding graph
-                // would not be re-created), so we opt to create it every time
-//                if (KASRDecodingGraph.decodingGraphWithNameExists(dgName, recognizer)) {
-//                    Log.i(TAG, "Decoding graph " + dgName + " alread exists. IT WON'T BE RECREATED");
-//                    Log.i(TAG, "Created on " + KASRDecodingGraph.getDecodingGraphCreationDate(dgName, recognizer));
-//                } else {
-                    KASRDecodingGraph.createDecodingGraphFromSentences(phrases, recognizer, dgName); //
-//                }
 
-//                KASRDecodingGraph.createDecodingGraphFromSentencesWithTriggerPhrase(phrases, "Hey computer", recognizer, dgName); // TODO check return code
-                recognizer.prepareForListeningWithCustomDecodingGraphWithName(dgName);
+            if (recognizer != null) {
+               String[] phrases = MainActivity.getPhrases();
+               String dgName = "words";
+
+//              KASRAlternativePronunciation altPron1 = new KASRAlternativePronunciation("HOUSE", "HH AH0 Z", "BAD");
+//              KASRAlternativePronunciation altPron2 = new KASRAlternativePronunciation("BOOK", "B AH0 Z", "BAD");
+//              KASRAlternativePronunciation altPron3 = new KASRAlternativePronunciation("PAGE", "P AH0 Z", "BAD");
+//
+//              ArrayList<KASRAlternativePronunciation> altProns = new ArrayList<KASRAlternativePronunciation>();
+//              altProns.add(altPron1);
+//              altProns.add(altPron2);
+//              altProns.add(altPron3);
+//              Log.i("", "Setup with " + altProns.size() + " alternative pronunciations");
+
+                // example of creating decoding graph with more control
+                // phrases here would correspond to the content user is supposed to read
+//              KASRDecodingGraph.createDecodingGraphFromPhrases(phrases, recognizer, altProns,
+//                      KASRDecodingGraph.KASRSpeakingTask.KASRSpeakingTaskOralReading, 0.5, dgName);
+
+
+                // example of creating contextual decoding graph (you will also need to call
+                // corresponding prepareForListening method
+//              ArrayList<ArrayList<String>> contextualPhrases = new ArrayList<ArrayList<String>>();
+//              ArrayList<String> page1 = new ArrayList<String>();
+//              page1.add("page one");
+//              page1.add("page two");
+//              contextualPhrases.add(page1);
+//              ArrayList<String> page2 = new ArrayList<String>();
+//              page2.add("book three");
+//              page2.add("book four");
+//              contextualPhrases.add(page2);
+//
+//              KASRDecodingGraph.createContextualDecodingGraphFromSentences(contextualPhrases, recognizer, altProns,
+//                        KASRDecodingGraph.KASRSpeakingTask.KASRSpeakingTaskOralReading, dgName);
+
+              // We don't have to recreate the decoding graph every time since they persist in the
+              // file system when created, but during the development this could be a problem if th
+              // list of phrases (or any other input parameters) is changed resulting in new
+              // decoding graph not being re-created), so we opt to create it every time in this PoC.
+              // In a real app you might want to encode some additional information in the decoding graph
+              // name (e.g. your app version), to enforce decoding graphs are built only when needed
+//            if (KASRDecodingGraph.decodingGraphWithNameExists(dgName, recognizer)) {
+//              Log.i(TAG, "Decoding graph " + dgName + " already exists. IT WON'T BE RECREATED");
+//            } else {
+
+              Log.i(TAG, "Creating decoding graph");
+              if ( ! KASRDecodingGraph.createDecodingGraphFromPhrases(phrases, recognizer, dgName)) {
+                  Log.w(TAG, "Unable to create decoding graph " + dgName);
+                  return 0l;
+              } else {
+                  Log.i(TAG, "Done creating decoding graph");
+              }
+
+              // we now use the graph we created to prepare the recognizer for listening
+              if ( ! recognizer.prepareForListeningWithDecodingGraphWithName(dgName, true)) {
+                  Log.w(TAG, "Unable to prepare for listening with graph " + dgName);
+                  return 0l;
+              }
+              Log.i(TAG, "Recognizer prepared with graph: " + recognizer.getDecodingGraphName());
+              // alternatively, if you were using contextual graph, you would also need to set the context
+              // and switch it as necessary. Here, we set it to context 0
+              // recognizer.prepareForListeningWithContextualDecodingGraphWithName(dgName, 0);
             } else {
                 Log.e(TAG, "Unable to retrieve recognizer");
+                return 0l;
             }
             return 1l;
         }
-
-
 
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
@@ -308,14 +378,13 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             if (recognizer!=null) {
                 Log.i(TAG, "Adding listener");
                 recognizer.addListener(MainActivity.instance);
-                recognizer.addTriggerPhraseListener(MainActivity.instance);
-                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1.0f);
-                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1.0f);
-                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 15.0f);
+                // for more details on trade-offs when settings end-silence parameters, please see
+                // this page: https://keenresearch.com/keenasr-docs/keenasr-getting-started.html#start-and-stop-listening
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForGoodMatch, 1f);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutEndSilenceForAnyMatch, 1f);
+                recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutMaxDuration, 20.0f);
                 recognizer.setVADParameter(KASRRecognizer.KASRVadParameter.KASRVadTimeoutForNoSpeech, 5.0f);
 
-                recognizer.setCreateAudioRecordings(true);
-                recognizer.adaptToSpeakerWithName("test");
                 final Button startButton = (Button) findViewById(R.id.startListening);
                 startButton.setEnabled(true);
             } else {
@@ -324,6 +393,9 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         }
     }
 
+    // You can change this method to your liking, to define the phrases that will be used to build
+    // a decoding graph. If you expect individual words, you should specify them as such; if you
+    // expect phrases, you should specify them as phrases (not as individual words).
     private static String[] getPhrases() {
         String[] phrases = {
                 "I don't know",
@@ -354,8 +426,15 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
                 "seven",
                 "eight",
                 "nine",
-                "ten"
+                "ten",
+                "I love how tall I am.",
+                "I love to play ball."
         };
+
+//        String[] phrases = {
+//                "once upon a time there were three little pigs",
+//                "one pig built a house of straw"
+//        };
         return phrases;
     }
 }
