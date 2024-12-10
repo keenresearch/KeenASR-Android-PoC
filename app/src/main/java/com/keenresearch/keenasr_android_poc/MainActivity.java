@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             ArrayList<String> assets = new ArrayList<String>();
-            String asrBundleName = "keenAK3m-nnet3chain-en-us";
+            String asrBundleName = "keenA1m-nnet3chain-en-us";
 
             assets.add(asrBundleName + "/decode.conf");
             assets.add(asrBundleName + "/final.dubm");
