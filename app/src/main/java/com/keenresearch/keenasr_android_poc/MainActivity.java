@@ -344,7 +344,9 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 //            } else {
 
               Log.i(TAG, "Creating decoding graph");
-              if ( ! KASRDecodingGraph.createDecodingGraphFromPhrases(phrases, recognizer, dgName)) {
+              if ( ! KASRDecodingGraph.createDecodingGraphFromPhrases(phrases, recognizer,
+                      null, KASRDecodingGraph.KASRSpeakingTask.KASRSpeakingTaskDefault,
+                      0.8f, dgName)) {
                   Log.w(TAG, "Unable to create decoding graph " + dgName);
                   return 0l;
               } else {
