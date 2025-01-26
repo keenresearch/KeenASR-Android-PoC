@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
     private ASyncASRInitializerTask asyncASRInitializerTask;
     public static MainActivity instance;
     private Boolean micPermissionGranted = false;
-    private BluetoothManager btManager;
+//    private BluetoothManager btManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
         Context context = this.getApplication().getApplicationContext();
 
-        btManager = BluetoothManager.getInstance(context);
-        btManager.initBluetooth();
+//        btManager = BluetoothManager.getInstance(context);
+//        btManager.initBluetooth();
 
         if (KASRRecognizer.sharedInstance() == null) {
             Log.i(TAG, "Initializing KeenASR recognizer");
