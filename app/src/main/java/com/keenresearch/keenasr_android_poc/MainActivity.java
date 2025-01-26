@@ -252,34 +252,13 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             ArrayList<String> assets = new ArrayList<String>();
             String asrBundleName = "keenA1m-nnet3chain-en-us";
 
-            assets.add(asrBundleName + "/decode.conf");
-            assets.add(asrBundleName + "/final.dubm");
-            assets.add(asrBundleName + "/final.ie");
-            assets.add(asrBundleName + "/final.mat");
-            assets.add(asrBundleName + "/final.mdl");
-            assets.add(asrBundleName + "/global_cmvn.stats");
-            assets.add(asrBundleName + "/ivector_extractor.conf");
-            assets.add(asrBundleName + "/mfcc.conf");
-            assets.add(asrBundleName + "/online_cmvn.conf");
-            assets.add(asrBundleName + "/splice.conf");
-            assets.add(asrBundleName + "/splice_opts");
-            assets.add(asrBundleName + "/wordBoundaries.int");
-            assets.add(asrBundleName + "/words.txt");
-            assets.add(asrBundleName + "/lang/lexicon.txt");
-            assets.add(asrBundleName + "/lang/phones.txt");
-            assets.add(asrBundleName + "/lang/tree");
-            assets.add(asrBundleName + "/lang/unk_inv.fst");
-            assets.add(asrBundleName + "/gop_assets/HCLG.fst");
-            assets.add(asrBundleName + "/gop_assets/decode.conf");
-            assets.add(asrBundleName + "/gop_assets/phone-to-pure-phone.int");
-            assets.add(asrBundleName + "/gop_assets/phones-pure.txt");
-            assets.add(asrBundleName + "/gop_assets/pronunciation_model_batch.ort");
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
             String asrBundlePath = new String(asrBundleRootPath + "/" + asrBundleName);
 
             try {
-                asrBundle.installASRBundle(assets, asrBundleRootPath);
+//                asrBundle.installASRBundle(assets, asrBundleRootPath);
+                asrBundle.installASRBundle(asrBundleName, asrBundleRootPath);
             } catch (IOException e) {
                 Log.e(TAG, "Error occurred when installing ASR bundle" + e);
                 return 0l;
