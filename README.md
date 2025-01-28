@@ -3,6 +3,8 @@
 # KeenASR Android Proof of Concept App
 This proof-of-concept app ships with a trial version of KeenASR SDK, which will exit (crash) the app 15min after the app starts. If you would like to obtain a version of the framework without this limitation, contact us at info@keenresearch.com.
 
+**NOTE:** when deploying the APK file from Android Studio, make sure your phone is not locked. Android Studio will push and start the app even if the phone is locked, but SDK won't be initialized properly because of restrictions on using the microphone while the app is not in the background. (in real-life scenario, app will be started on an unlocked phone when user taps on the app icon)
+
 By cloning this repository and downloading the trial KeenASR SDK or ASR Bundle you agree to the [Trial SDK Licensing Agreement](https://keenresearch.com/keenasr-docs/keenasr-trial-sdk-licensing-agreement.html)
 
 For more details about the SDK see: http://keenresearch.com/keenasr-docs
