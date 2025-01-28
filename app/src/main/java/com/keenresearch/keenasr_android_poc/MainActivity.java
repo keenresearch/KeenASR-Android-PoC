@@ -25,6 +25,7 @@ import com.keenresearch.keenasr.KASRDecodingGraph;
 import com.keenresearch.keenasr.KASRRecognizer;
 import com.keenresearch.keenasr.KASRResponse;
 import com.keenresearch.keenasr.KASRResult;
+import com.keenresearch.keenasr.KASRUploader;
 import com.keenresearch.keenasr.KASRWord;
 import com.keenresearch.keenasr.KASRPhone;
 import com.keenresearch.keenasr.KASRRecognizerListener;
@@ -133,6 +134,14 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         File dir = this.getApplication().getApplicationContext().getCacheDir();
         response.saveAudio(dir);
         response.saveJson(dir);
+
+        // we can also queue the response for upload to Dashboard (Keen Research's backend) where
+        // you can access audio, ASR result, etc. for further analysis. This code is commented out
+        // since we don't want to fill up the disk space because KASRUploader needs to be created
+        // with an app key, in order to start sending the data
+//        if (! response.queueForUpload()) {
+//            Log.w(TAG, "Unable to queue response for upload");
+//        }
 
         // some additional metadata in the response
         Log.i(TAG, "audioFilepath:" + response.getAudioFilename());
@@ -249,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         protected Long doInBackground(String... params) {
             Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
-            ArrayList<String> assets = new ArrayList<String>();
             String asrBundleName = "keenA1m-nnet3chain-en-us";
 
 
@@ -257,7 +265,6 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
             String asrBundlePath = new String(asrBundleRootPath + "/" + asrBundleName);
 
             try {
-//                asrBundle.installASRBundle(assets, asrBundleRootPath);
                 asrBundle.installASRBundle(asrBundleName, asrBundleRootPath);
             } catch (IOException e) {
                 Log.e(TAG, "Error occurred when installing ASR bundle" + e);
@@ -368,6 +375,9 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
 
                 final Button startButton = (Button) findViewById(R.id.startListening);
                 startButton.setEnabled(true);
+//                if (! KASRUploader.createDataUploader(recognizer, "YOUR_APP_DASHBOARD_KEY")) {
+//                    Log.w(TAG, "Unable to create KASRUploader");
+//                }
             } else {
                 Log.e(TAG, "Recognizer wasn't initialized properly");
             }
