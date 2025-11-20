@@ -3,6 +3,11 @@ package com.keenresearch.keenasr_android_poc;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import android.annotation.TargetApi;
@@ -179,10 +184,14 @@ public class BluetoothManager extends BroadcastReceiver {
         return false;
     }
 
+    // TODO: Add relevant checks and remove this decorator
+    @SuppressLint("MissingPermission")
     public boolean isUsingBluetoothAudioRoute() {
         return mBluetoothHeadset != null && mBluetoothHeadset.isAudioConnected(mBluetoothDevice) && isScoConnected;
     }
 
+    // TODO: Add relevant checks and remove this decorator
+    @SuppressLint("MissingPermission")
     public boolean isBluetoothHeadsetAvailable() {
         ensureInit();
         if (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled() && mAudioManager != null && mAudioManager.isBluetoothScoAvailableOffCall()) {
