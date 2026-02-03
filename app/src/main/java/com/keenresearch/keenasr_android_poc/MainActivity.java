@@ -260,19 +260,18 @@ public class MainActivity extends AppCompatActivity implements KASRRecognizerLis
         }
 
         protected Long doInBackground(String... params) {
-            Log.i(TAG, "Installing ASR Bundle");
             KASRBundle asrBundle = new KASRBundle(this.context);
             String asrBundleName = "keenA1m-nnet3chain-en-us";
-
 
             String asrBundleRootPath = getApplicationInfo().dataDir;
             String asrBundlePath = asrBundleRootPath + "/" + asrBundleName;
 
-            try {
-                asrBundle.installASRBundle(asrBundleName, asrBundleRootPath);
-            } catch (IOException e) {
-                Log.e(TAG, "Error occurred when installing ASR bundle" + e);
-                return 0L;
+            if (! asrBundle.isInstalled(asrBundlePath)) {
+                Log.i(TAG, "Installing ASR Bundle");
+                if (! asrBundle.installASRBundle(asrBundleName, asrBundleRootPath)) {
+                    Log.e(TAG, "Error occurred when installing ASR bundle");
+                    return 0L;
+                }
             }
             Log.i(TAG, "Waiting for microphone permission to be granted");
             while (!micPermissionGranted) {
